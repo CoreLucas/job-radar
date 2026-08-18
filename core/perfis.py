@@ -1,19 +1,13 @@
-"""Perfis de mercado (Brasil / Internacional) do JobRadar.
+"""Perfil de mercado Brasil do JobRadar.
 
-Antes disso existiam DOIS programas quase idênticos — main.py e
-main_intl.py — cada um com sua própria cópia do ciclo de busca (buscar →
-filtrar → checar dedup → notificar antes de salvar → funil por fonte →
-alerta de saúde → heartbeat). O que diverge de verdade entre os dois
-mercados é só DADO: fontes, termos de busca, cidades aceitas, regra de
-cargo. A lógica de execução em si é a mesma — daí valer a pena descrever
-cada mercado como um objeto (`Perfil`) e ter um único motor (main.py) que
-roda qualquer um dos dois, escolhido em tempo de execução via `--perfil`.
+Define as fontes, termos de busca, cidades aceitas e regras de cargo
+para o mercado brasileiro. O `Perfil` encapsula toda a configuração
+necessária para o ciclo de busca (buscar → filtrar → checar dedup →
+notificar antes de salvar → funil por fonte → alerta de saúde → heartbeat).
 
-Cada `Perfil` tem uma `chave` curta (usada tanto no argumento --perfil
-quanto como sufixo nas chaves da tabela `metadados` — rodízio de termos,
-cadência de baixa frequência e heartbeat ficam isolados por perfil, mesmo
-os dois perfis rodando na mesma execução do workflow e escrevendo no mesmo
-jobs.db).
+A `chave` do perfil é usada tanto no argumento --perfil quanto como sufixo
+nas chaves da tabela `metadados` (rodízio de termos, cadência de baixa
+frequência e heartbeat).
 """
 
 from dataclasses import dataclass, field
@@ -32,28 +26,14 @@ from core.config import (
     TERMOS_BUSCA,
     TERMOS_POR_CICLO,
 )
-from core.config_intl import (
-    KEYWORDS_INTL,
-    TERMOS_BUSCA_INTL,
-    TERMOS_POR_CICLO_INTL,
-    LOCATIONS_INTL,
-    DOMINIOS_INDEED_INTL,
-    CIDADES_INTL,
-    ATIVAR_EIXO_IBERICO,
-    MERCADOS_REMOTO_ACEITOS_INTL,
-    IDIOMAS_EXIGIDOS_INTL,
-)
 from core.job import RegrasFiltro
 from scrapers.catho import CathoScraper
 from scrapers.geekhunter import GeekHunterScraper
 from scrapers.gupy import GupyScraper
 from scrapers.indeed import IndeedScraper
-from scrapers.indeed_intl import IndeedIntlScraper
 from scrapers.jobs99 import Jobs99Scraper
 from scrapers.linkedin import LinkedInScraper
-from scrapers.linkedin_intl import LinkedInIntlScraper
 from scrapers.solides import SolidesScraper
-from scrapers.weworkremotely_intl import WeWorkRemotelyIntlScraper
 
 # "alta" roda TODO ciclo; "baixa" roda só na primeira execução de cada dia
 # (ver _fontes_baixa_frequencia_ja_rodaram_hoje em main.py). Existe pra
@@ -143,13 +123,6 @@ _REGRAS_BR_IBERIA = RegrasFiltro(
 # vagas brutas retornadas, somado por fonte). Gupy e LinkedIn confirmam o
 # que foi medido à parte (Gupy ~2,6%); Catho, GeekHunter e 99Jobs ficam
 # abaixo de 1%.
-#
-# WeWorkRemotelyIntlScraper reaproveitado aqui (não duplicado): é agregador
-# de vaga 100% remota que cobre o mercado "remoto internacional" que
-# nenhuma das 8 fontes brasileiras alcança — mesmo scraper usado no perfil
-# internacional, sem nada daquele perfil hardcoded. Sem medição própria
-# ainda pra essa combinação (fonte + termos em português) — FREQUENCIA_BAIXA
-# até medir rendimento real.
 _SCRAPERS_BR = [
     DefinicaoScraper(GupyScraper, FREQUENCIA_ALTA),        # ~2,6% de rendimento
     DefinicaoScraper(LinkedInScraper, FREQUENCIA_ALTA),     # ~8,5% — a melhor fonte de longe
@@ -158,7 +131,6 @@ _SCRAPERS_BR = [
     DefinicaoScraper(CathoScraper, FREQUENCIA_BAIXA),       # <1%, timeout frequente em headless
     DefinicaoScraper(GeekHunterScraper, FREQUENCIA_BAIXA),  # <1%
     DefinicaoScraper(Jobs99Scraper, FREQUENCIA_BAIXA),      # <1%, fonte confirmada funcionando
-    DefinicaoScraper(WeWorkRemotelyIntlScraper, FREQUENCIA_BAIXA),  # nova, sem medição própria
 ]
 
 PERFIL_BR = Perfil(
@@ -176,63 +148,6 @@ PERFIL_BR = Perfil(
     max_scrapers_concorrentes=4,
 )
 
-
-# Regra primária: só remoto ("Remote"/"Remoto" em CIDADES_INTL), mercado
-# LATAM/Portugal/Espanha aceito. Sem cargo ambíguo/ferramenta ainda nesse
-# perfil — simples de propósito por ser o mais novo dos dois.
-#
-# idiomas_exigidos: sem mercado declarado, exige espanhol/português/LATAM
-# no título (ver IDIOMAS_EXIGIDOS_INTL e comentário em RegrasFiltro) — a
-# busca já tentava garantir isso via termo, mas nunca era reconferido na
-# vaga em si.
-_REGRAS_INTL = RegrasFiltro(
-    keywords_forte=KEYWORDS_INTL,
-    keywords_ambiguo=[],
-    qualificadores_dados=[],
-    ferramentas_titulo=[],
-    qualificadores_cargo=[],
-    cidades=CIDADES_INTL,
-    mercados_remoto_aceitos=MERCADOS_REMOTO_ACEITOS_INTL,
-    idiomas_exigidos=IDIOMAS_EXIGIDOS_INTL,
-)
-
-# Eixo secundário (Ibéria): vaga presencial/híbrida em Portugal/Espanha,
-# achada de propósito (LOCATIONS_INTL busca lá) mas que CIDADES_INTL (só
-# remoto) rejeitaria. DESLIGADO — mesmo motivo do eixo BR acima.
-_REGRAS_INTL_IBERIA = RegrasFiltro(
-    keywords_forte=KEYWORDS_INTL,
-    keywords_ambiguo=[],
-    qualificadores_dados=[],
-    ferramentas_titulo=[],
-    qualificadores_cargo=[],
-    cidades=CIDADES_EUROPA_IBERICA,
-)
-
-# As 3 fontes rodam toda vez (FREQUENCIA_ALTA) — perfil novo, sem medição de
-# rendimento por fonte ainda que justifique separar em cadência alta/baixa
-# como o perfil BR. Ajustar quando/se tiver dado real.
-_SCRAPERS_INTL = [
-    DefinicaoScraper(LinkedInIntlScraper, FREQUENCIA_ALTA, {"locations": LOCATIONS_INTL}),
-    DefinicaoScraper(IndeedIntlScraper, FREQUENCIA_ALTA, {"dominios": DOMINIOS_INDEED_INTL}),
-    DefinicaoScraper(WeWorkRemotelyIntlScraper, FREQUENCIA_ALTA),
-]
-
-PERFIL_INTL = Perfil(
-    chave="internacional",
-    nome="Internacional",
-    palavras_monitoradas=KEYWORDS_INTL,
-    paises_pesquisados=LOCATIONS_INTL,
-    regras=_REGRAS_INTL,
-    regras_eixo_secundario=_REGRAS_INTL_IBERIA,
-    eixo_secundario_ativo=ATIVAR_EIXO_IBERICO,
-    eixo_secundario_rotulo="Ibéria",
-    termos_busca=TERMOS_BUSCA_INTL,
-    termos_por_ciclo=TERMOS_POR_CICLO_INTL,
-    definicao_scrapers=_SCRAPERS_INTL,
-    max_scrapers_concorrentes=3,
-)
-
 PERFIS = {
     PERFIL_BR.chave: PERFIL_BR,
-    PERFIL_INTL.chave: PERFIL_INTL,
 }

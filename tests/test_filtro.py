@@ -23,7 +23,7 @@ virar asserção, não deduzido lendo o comentário.
 import pytest
 
 from core.job import Job, extrair_escopo_remoto
-from core.perfis import PERFIL_BR, PERFIL_INTL
+from core.perfis import PERFIL_BR
 
 
 # ---------------------------------------------------------------------------
@@ -145,21 +145,6 @@ def test_extrair_escopo_remoto(nome, local, modalidade, esperado):
 # ---------------------------------------------------------------------------
 
 CASOS_COMBINA_COM = [
-    # Anti-regressão crítica (mesmo caso do teste de escopo, agora
-    # end-to-end): vaga americana sem sigla de estado tem que ser barrada
-    # no perfil internacional (que só aceita LATAM/Ibéria).
-    ("seattle-barrada-perfil-intl", "Senior Data Analyst", "Greater Seattle Area", "Remoto", PERFIL_INTL, False),
-    # Remota sem mercado declarado: só passa se o TÍTULO afirmar idioma/
-    # região (spanish/portuguese/latam/...) — regra adicionada depois que
-    # "Senior Data Analyst" remoto sem relação nenhuma com o mercado
-    # passava só por não ter nada que a rejeitasse.
-    ("spanish-speaking-sem-mercado-passa", "Spanish Speaking Data Analyst", "Remote", "Remoto", PERFIL_INTL, True),
-    ("data-analyst-latam-passa", "Data Analyst LATAM", "Remote", "Remoto", PERFIL_INTL, True),
-    ("sem-idioma-sem-mercado-barrada", "Senior Data Analyst", "Remote", "Remoto", PERFIL_INTL, False),
-    # Mercado CONFIRMADO no texto dispensa o sinal de idioma no título — o
-    # país hispanofalante já é o próprio sinal.
-    ("mercado-confirmado-dispensa-idioma-no-titulo", "Senior Data Analyst", "Remote - Espanha", "Remoto", PERFIL_INTL, True),
-
     # Perfil Brasil: cargo e cidade são checados em campos separados
     # (título vs. local) — cidade fora da lista aceita barra mesmo com
     # cargo batendo.

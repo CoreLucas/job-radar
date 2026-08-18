@@ -2,11 +2,9 @@
 
 ## 📌 Resumo Rápido
 
-Existem **2 perfis** que podem rodar separados ou juntos:
-- **brasil** - Vagas no Brasil (Nordeste + algumas cidades) ou remotas para Brasil/LATAM
-- **internacional** - Vagas remotas fora do Brasil que aceitam português/espanhol
+O JobRadar busca vagas no Brasil (Nordeste + algumas cidades) ou remotas para Brasil/LATAM.
 
-## 🇧🇷 Configurar Perfil BRASIL
+## 🇧🇷 Configurar Vagas
 
 ### Arquivo: `core/config.py`
 
@@ -75,70 +73,16 @@ CIDADES = [
 
 ---
 
-## 🌎 Configurar Perfil INTERNACIONAL
+## 🚀 Como Rodar
 
-### Arquivo: `core/config_intl.py`
-
-#### 1. Cargos aceitos (linhas 18-48)
-
-```python
-KEYWORDS_INTL = [
-    "Data Analyst",
-    "Business Intelligence",
-    "Analista de Dados",
-    "Analista de Datos",  # espanhol
-    # Adicione mais cargos aqui
-]
-```
-
-#### 2. Termos de busca (linhas 54-115)
-
-```python
-TERMOS_BUSCA_INTL = [
-    "data analyst spanish speaker",
-    "business intelligence portuguese speaker",
-    "remote data analyst latam",
-    "analista de datos remoto",
-    # Adicione mais combinações aqui
-]
-```
-
-#### 3. Países pesquisados (linhas 138-147)
-
-```python
-LOCATIONS_INTL = [
-    "Spain",
-    "Portugal",
-    "Mexico",
-    "Colombia",
-    "Argentina",
-    "Chile",
-    # Adicione mais países aqui
-]
-```
-
----
-
-## 🚀 Como Rodar Depois de Configurar
-
-### Rodar apenas perfil Brasil:
+### Rodar uma única vez:
 ```bash
 python main.py --perfil brasil --once
 ```
 
-### Rodar apenas perfil Internacional:
-```bash
-python main.py --perfil internacional --once
-```
-
-### Rodar os dois perfis juntos:
-```bash
-python main.py --perfil brasil internacional --once
-```
-
 ### Rodar em loop contínuo (checando a cada 3h):
 ```bash
-python main.py --perfil brasil internacional
+python main.py --perfil brasil
 ```
 
 ---
