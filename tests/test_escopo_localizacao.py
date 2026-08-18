@@ -111,7 +111,7 @@ def test_remoto_sem_escopo_declarado_nao_restringe(local):
 # --------------------------------- MODALIDADE QUANDO A FONTE NAO INFORMA
 
 from core.job import Job                     # noqa: E402
-from core.perfis import PERFIL_BR, PERFIL_INTL  # noqa: E402
+from core.perfis import PERFIL_BR  # noqa: E402
 
 
 def _vaga(local, modalidade, titulo="Analista de Dados"):
