@@ -7,24 +7,49 @@ load_dotenv()
 # Cargo forte: título que só existe mesmo em vaga de dados/BI, sem
 # possibilidade real de ser outra área.
 KEYWORDS_CARGO_FORTE = [
+    # Perfil Júnior/Estagiário - Prioridade ALTA
     "Analista de Dados",
+    "Analista de Dados Júnior",
+    "Analista de Dados Jr",
+    "Data Analyst",
+    "Data Analyst Junior",
+    "Junior Data Analyst",
+    "Cientista de Dados",
+    "Cientista de Dados Júnior",
+    "Data Scientist",
+    "Junior Data Scientist",
+    "Estagiário em Dados",
+    "Estagiário de Dados",
+    "Estágio em Dados",
+    "Estágio em Ciência de Dados",
+    "Data Intern",
+    "Trainee de Dados",
+    "Trainee Data",
+    # BI e Analytics - Prioridade ALTA
     "Analista BI",
     "Analista de BI",
+    "Analista BI Júnior",
+    "Analista BI Jr",
     "Business Intelligence",
+    "BI Analyst",
+    "Junior BI Analyst",
+    "Estagiário BI",
+    "Estágio em BI",
     "Data Analytics",
     "Analista de Analytics",
-    "Data Analyst",
-    "Desenvolvedor BI",
-    "Consultor BI",
-    "Analista de Inteligência de Negócios",
-    "BI Developer",
-    "BI Analyst",
+    "Analytics Analyst",
+    # Reporting e Dashboards
     "Analista de Reporting",
-    "Analista de Inteligência de Mercado",
-    "Analista de Indicadores",
     "Reporting Analyst",
+    "Analista de Indicadores",
     "Insights Analyst",
     "Data Insights Analyst",
+    # Outros relevantes
+    "Analista de Inteligência de Negócios",
+    "Desenvolvedor BI",
+    "BI Developer",
+    "Consultor BI",
+    "Analista de Inteligência de Mercado",
     "MIS Analyst",
     "Analista de MIS",
     "Assistente de BI",
@@ -37,11 +62,11 @@ KEYWORDS_CARGO_FORTE = [
     "Analytics Specialist",
     "Especialista em Dados",
     "Analista de Planejamento e Dados",
-    # "Datos" (espanhol) não é "Dados" (português) — nenhuma keyword em
-    # português cobre título em espanhol, mesmo sendo a mesma vaga. Faz
-    # sentido aqui no pipeline BR (não só em config_intl.py) porque
-    # LinkedInScraper já busca em Argentina/Chile (ver LOCATIONS_LINKEDIN).
+    # Espanhol (LATAM)
     "Analista de Datos",
+    "Analista de Datos Junior",
+    "Científico de Datos",
+    "Científico de Datos Junior",
     "Analítica de Datos",
 ]
 
@@ -72,6 +97,12 @@ QUALIFICADORES_DADOS = [
     "métricas",
     "reporting",
     "insights",
+    # Adicionais do perfil Lucas
+    "python",
+    "scraping",
+    "automação",
+    "visualização",
+    "excel",
 ]
 
 # Ferramenta que aparece como núcleo do título ("Analista de Power BI").
@@ -113,11 +144,22 @@ KEYWORDS = KEYWORDS_CARGO_FORTE + KEYWORDS_CARGO_AMBIGUO
 # por sorte via outro termo. Com a derivação automática isso não pode mais
 # acontecer — toda keyword nova em KEYWORDS já vira busca também.
 TERMOS_CARGO_EXTRA = [
-    # termos mais amplos que a keyword exata, mantidos por dar rede mais
-    # larga na busca (a keyword em si é mais restrita, de propósito, pra
-    # não gerar falso positivo no filtro de título).
+    # Termos mais amplos que a keyword exata
     "power bi",
     "inteligência de mercado",
+    # Perfil júnior/estagiário específico
+    "estagio dados",
+    "estágio dados",
+    "estagiario dados",
+    "junior data",
+    "trainee dados",
+    "analista junior",
+    "analista jr",
+    # Web Scraping (diferencial do Lucas)
+    "web scraping",
+    "scraping",
+    "automação de dados",
+    "coleta de dados",
 ]
 
 TERMOS_CARGO = sorted(set(k.lower() for k in KEYWORDS) | set(TERMOS_CARGO_EXTRA))
@@ -133,12 +175,20 @@ TERMOS_CARGO = sorted(set(k.lower() for k in KEYWORDS) | set(TERMOS_CARGO_EXTRA)
 # confirma o padrão relatado. Removidos por render zero e custarem sessão
 # igual a um termo de cargo.
 TERMOS_FERRAMENTA = [
-    "sql",
+    # Stack do Lucas (prioridade)
     "python",
+    "sql",
+    "power bi",
+    "excel",
+    "pandas",
+    "selenium",
+    # Outras ferramentas relevantes
     "tableau",
     "qlik",
     "looker",
     "bigquery",
+    "numpy",
+    "matplotlib",
 ]
 
 TERMOS_BUSCA = TERMOS_CARGO + TERMOS_FERRAMENTA
